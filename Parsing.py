@@ -16,9 +16,8 @@ def get_links_by_class(url, class_name):
             links.append(link)
     return links
 
+
 url = 'https://student39.ru/news/'
 class_name = 'newsItem'
 
 links = get_links_by_class(url, class_name)
-
-

@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 
+
 def compare_excel_files(file1, file2):
     # Загрузка данных из файлов Excel
     df1 = pd.read_excel(file1)
@@ -19,12 +20,14 @@ def compare_excel_files(file1, file2):
 
     return result
 
+
 # Получение двух последних файлов Excel в директории
 directory = 'C:/Users/Sugimoto/PycharmProjects/KBKBot/Excel'
 files = os.listdir(directory)
 excel_files = [file for file in files if file.endswith('.xlsx') or file.endswith('.xls')]
 excel_files.sort(key=lambda x: os.path.getmtime(os.path.join(directory, x)), reverse=True)
 recent_files = excel_files[:2]
+
 
 def proof():
     # Проверка изменений в последних двух файлах
@@ -35,6 +38,7 @@ def proof():
         return result
     else:
         return "Недостаточно файлов для сравнения"
+
 
 output = proof()
 

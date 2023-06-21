@@ -54,5 +54,3 @@ def read_schedule(input_file, group_name):
 def print_column_by_group(groups, lessons, group_name):
     group_index = groups.index(group_name)
     lesson = lessons[group_index]
-
-

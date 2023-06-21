@@ -19,18 +19,24 @@ bot = Bot(token='5790202829:AAGlXbk17iGU0bYsB5vPVgEiBQ5nyMiUDsc')
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
+
 # Define the state for waiting for group input
 class ScheduleMenuState(StatesGroup):
     waiting_for_group = State()
+
 
 # Define the handler for the /start command
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons = [types.KeyboardButton(text='Новости'), types.KeyboardButton(text='Расписание'), types.KeyboardButton(text='Изменения в расписании')]
+    buttons = [types.KeyboardButton(text='Новости'), types.KeyboardButton(text='Расписание'),
+               types.KeyboardButton(text='Изменения в расписании')]
     keyboard.add(*buttons)
 
-    await message.answer("Доброго дня, студент! Я КБК БОТ, создан для улучшения твоей жизни. Выбери панель команды находящиеся на панели кнопок", reply_markup=keyboard)
+    await message.answer(
+        "Доброго дня, студент! Я КБК БОТ, создан для улучшения твоей жизни. Выбери панель команды находящиеся на панели кнопок",
+        reply_markup=keyboard)
+
 
 # Define the handler for the News button
 @dp.message_handler(text='Новости')
@@ -42,7 +48,8 @@ async def news(message: types.Message):
     # Send each link as a separate message with a delay
     for index, link in enumerate(links, start=1):
         await asyncio.sleep(0.5)  # Delay for 0.5 seconds before sending each message
-        await message.answer(f"Link {index}: https://student39.ru{link}")
+        await message.answer(f"Ссылка {index}: https://student39.ru{link}")
+
 
 # Define the handler for the Schedule button
 @dp.message_handler(text='Расписание')
@@ -51,19 +58,24 @@ async def schedule_menu(message: types.Message):
     buttons = [types.KeyboardButton(text='Введите свою группу'), types.KeyboardButton(text='Главное меню')]
     keyboard.add(*buttons)
 
-    await message.answer("Выберите кнопку 'Ввести группу' для открытия расписания или вернитесь в главное меню на кнопку 'Главное меню':", reply_markup=keyboard)
+    await message.answer(
+        "Выберите кнопку 'Ввести группу' для открытия расписания или вернитесь в главное меню на кнопку 'Главное меню':",
+        reply_markup=keyboard)
+
 
 # Define the handler for the "Enter your group" button
 @dp.message_handler(text='Введите свою группу', state='*')
 async def enter_group_menu(message: types.Message):
-    await message.answer("Пожалуйста введите имя своей группы! Важный момент, вводите имя своей группы без знака '-' Например: 20ИСП4 или 21ИСА3")
+    await message.answer("Пожалуйста введите имя своей группы например: 20-ИСП-4 или 21-ИСА-3 !")
     await ScheduleMenuState.waiting_for_group.set()
+
 
 # Define the handler for the "Back" button
 @dp.message_handler(text='Главное меню', state='*')
 async def back_to_main_menu(message: types.Message, state: FSMContext):
     await state.finish()
     await start(message)
+
 
 # Define the handler for receiving the group name in the schedule menu
 @dp.message_handler(state=ScheduleMenuState.waiting_for_group)
@@ -75,12 +87,13 @@ async def receive_group_name_schedule_menu(message: types.Message, state: FSMCon
     newest_file = max([os.path.join(directory, f) for f in os.listdir(directory)], key=os.path.getctime)
 
     groups, lessons, schedule_data = read_schedule(newest_file, group_name)
-    schedule_text = f"Schedule for group {group_name}:\n\n"
+    schedule_text = f"Расписание для группы {group_name}:\n\n"
     for day, schedule in schedule_data.items():
         schedule_text += f"{day}\t\t{schedule.get(group_name, '')}\n"
     await message.answer(schedule_text)
 
     await state.finish()
+
 
 # Define the handler for the Check button
 @dp.message_handler(text='Изменения в расписании')
@@ -99,7 +112,7 @@ async def check_schedule(message: types.Message):
                 changes.append(column)
 
         if not changes:
-            result = "No changes"
+            result = "Изменений в расписании нет"
         else:
             result = f"Изменения в расписании для групп: {', '.join(changes)}. Студенты, пожалуйста проверьте расписание указанных групп !"
 
@@ -127,13 +140,17 @@ async def check_schedule(message: types.Message):
     # Send the message via the Telegram bot
     await message.answer(output)
 
+
 # Define the handler for unknown commands or messages
 @dp.message_handler()
 async def unknown_command(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons = [types.KeyboardButton(text='Новости'), types.KeyboardButton(text='Расписание'), types.KeyboardButton(text='Изменения в расписании')]
+    buttons = [types.KeyboardButton(text='Новости'), types.KeyboardButton(text='Расписание'),
+               types.KeyboardButton(text='Изменения в расписании')]
     keyboard.add(*buttons)
-    await message.answer("Такой команды не существует, пожалуйста воспользуйтесь панелью кнопок:", reply_markup=keyboard)
+    await message.answer("Такой команды не существует, пожалуйста воспользуйтесь панелью кнопок:",
+                         reply_markup=keyboard)
+
 
 # Start the bot
 if __name__ == '__main__':
